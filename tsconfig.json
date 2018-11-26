@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "module": "es6",
+    "lib": ["es6", "dom"],
+    "removeComments": true,
+    "target": "es6",
+    "sourceMap": true,
+    "allowJs": true,
+    "types": [
+            "babylonjs",
+            "babylonjs-gui",
+            "babylonjs-materials"
+        ]
+  }
+}
