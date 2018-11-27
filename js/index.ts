@@ -1,70 +1,55 @@
 import * as BABYLON from "babylonjs";
-import * as Mouse from './mouse';
+import * as Camera from './camera';
+import * as GameScene from './gamescene';
 
-const canvas: any = document.getElementById("renderCanvas");
-console.log(canvas);
+class Game {
+    private _canvas: HTMLCanvasElement;
+    private _engine: BABYLON.Engine;
+    private _scene: BABYLON.Scene;
+    private _camera: Camera.Camera;
+    private _light: BABYLON.Light;
 
-const engine: BABYLON.Engine = new BABYLON.Engine(canvas, true);
+    constructor(canvasElement : string) {
+        // Create canvas and engine.
+        this._canvas = document.getElementById(canvasElement) as HTMLCanvasElement;
+        this._engine = new BABYLON.Engine(this._canvas, true);
+    }
 
-    // This creates a basic Babylon Scene object (non-mesh)
-    var scene = new BABYLON.Scene(engine);
+    createScene() : void {
+        // Create a basic BJS Scene object.
+        this._scene = new BABYLON.Scene(this._engine);
+        this._scene.gravity = new BABYLON.Vector3(0, -9.81, 0);
+        this._scene.collisionsEnabled = true;
+        this._camera = new Camera.Camera('camera1', new BABYLON.Vector3(0, 5,-10), this._scene, this._canvas);
 
-	/********** UNIVERSAL CAMERA EXAMPLE **************************/
+        // Create a basic light, aiming 0,1,0 - meaning, to the sky.
+        this._light = new BABYLON.HemisphericLight('light1', new BABYLON.Vector3(0,1,0), this._scene);
 
-    // This creates and positions a universal camera (non-mesh)
-	var camera = new BABYLON.UniversalCamera("camera", new BABYLON.Vector3(0, 0, -10), scene);
+        new GameScene.GameScene(this._scene);
+    }
 
-    // This targets the camera to scene origin
-    camera.setTarget(BABYLON.Vector3.Zero());
+    doRender() : void {
+        // Run the render loop.
+        this._engine.runRenderLoop(() => {
+            this._scene.render();
+        });
 
-    // This attaches the camera to the canvas
-    camera.attachControl(canvas, true);
+        // The canvas/window resize event handler.
+        window.addEventListener('resize', () => {
+            this._engine.resize();
+        });
+    }
+}
 
-	/**************************************************************/
+window.addEventListener('DOMContentLoaded', () => {
+    // Create the game using the 'renderCanvas'.
+    let game = new Game('renderCanvas');
 
-    // This creates a light, aiming 0,1,0 - to the sky (non-mesh)
-    var light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+    // Create the scene.
+    game.createScene();
 
-	//Materials
-	var redMat = new BABYLON.StandardMaterial("red", scene);
-	redMat.diffuseColor = new BABYLON.Color3(255, 0, 0);
-	redMat.emissiveColor = new BABYLON.Color3(255, 0, 0);
-	redMat.specularColor = new BABYLON.Color3(255, 0, 0);
-
-	var greenMat = new BABYLON.StandardMaterial("green", scene);
-	greenMat.diffuseColor = new BABYLON.Color3(0, 255, 0);
-	greenMat.emissiveColor = new BABYLON.Color3(0, 255, 0);
-	greenMat.specularColor = new BABYLON.Color3(0, 255, 0);
-
-	var blueMat = new BABYLON.StandardMaterial("blue", scene);
-	blueMat.diffuseColor = new BABYLON.Color3(0, 0, 255);
-	blueMat.emissiveColor = new BABYLON.Color3(0, 0, 255);
-	blueMat.specularColor = new BABYLON.Color3(0, 0, 255);
-
-	// Shapes
-	var plane1 =  BABYLON.Mesh.CreatePlane("plane1", 3, scene, true, BABYLON.Mesh.DOUBLESIDE);
-	plane1.position.x = -3;
-	plane1.position.z = 0;
-	plane1.material = redMat;
-
-	var plane2 =  BABYLON.Mesh.CreatePlane("plane2", 3, scene, true, BABYLON.Mesh.DOUBLESIDE);
-	plane2.position.x = 3;
-	plane2.position.z = -1.5;
-	plane2.material = greenMat;
-
-	var plane3 =  BABYLON.Mesh.CreatePlane("plane3", 3, scene, true, BABYLON.Mesh.DOUBLESIDE);
-	plane3.position.x = 3;
-	plane3.position.z = 1.5;
-	plane3.material = blueMat;
-
-	var ground = BABYLON.Mesh.CreateGround("ground1", 10, 10, 2, scene);
-
-engine.runRenderLoop(function() {
-    scene.render();
-});
-
-window.addEventListener('resize', function() {
-    engine.resize();
+    // Start render loop.
+    game.doRender();
 });
 
 
