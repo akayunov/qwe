@@ -11,6 +11,13 @@ export class Camera extends BABYLON.FreeCamera{
 
         // Attach the camera to the canvas.
         this.attachControl(canvas, false);
+        this.keysDown.push(83);
+        this.keysUp.push(87);
+        this.keysLeft.push(65);
+        this.keysRight.push(68);
+
+        this.inertia = 0;
+        this.speed = 4;
         // attach gravity
 //        this.applyGravity = true;
         // define player ellipsoid
